@@ -794,15 +794,16 @@ var httpInspectInteractor = {
 // ----------------------------------------------------------------------
 
 function _migrateTopLevel(context) {
-    if(this._hostContext instanceof Ci.nsIDOMWindow)
-        this._hostContext.removeEventListener('unload', this._emergencyExit, false);
+//// TODO: this is only a temporary workaround 
+//    if(this._hostContext instanceof Ci.nsIDOMWindow)
+//        this._hostContext.removeEventListener('unload', this._emergencyExit, false);
 
     this._hostContext[this._name] = undefined;
     this._hostContext = context;
     this._hostContext[this._name] = this;
 
-    if(this._hostContext instanceof Ci.nsIDOMWindow)
-        this._hostContext.addEventListener('unload', this._emergencyExit, false);
+//    if(this._hostContext instanceof Ci.nsIDOMWindow)
+//        this._hostContext.addEventListener('unload', this._emergencyExit, false);
 }
 
 function _prompt(prompt) {
