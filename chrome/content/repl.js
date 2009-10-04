@@ -343,6 +343,11 @@ function inspect(obj, maxDepth, name, curDepth) {
         return;
 
     var i = 0;
+
+    // FIX: if it's a wrapped object inspect wrappedJSObject property
+    if (obj.wrappedJSObject)
+      obj = obj.wrappedJSObject;
+
     for(var prop in obj) {
         if(obj instanceof Ci.nsIDOMWindow &&
            (prop == 'java' || prop == 'sun' || prop == 'Packages')) {
