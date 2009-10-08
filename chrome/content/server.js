@@ -58,7 +58,7 @@ loader.loadSubScript('chrome://mozrepl/content/repl.js', REPL.prototype);
 // ----------------------------------------------------------------------
 
 var serv;
-
+var servers = [];
 
 // CODE
 // ----------------------------------------------------------------------
@@ -100,6 +100,7 @@ function start(port,interactors) {
 		serv.init(parseInt(item.port), pref.getBoolPref('loopbackOnly'), -1);
 		serv.asyncListen(this_server);
 		log('MozRepl: Listening on port '+item.port+' ('+item.type +')...');
+		servers.push(serv);
 	    });
 	}
 	else {
@@ -108,6 +109,7 @@ function start(port,interactors) {
             serv.init(port, pref.getBoolPref('loopbackOnly'), -1);
             serv.asyncListen(this);
             log('MozRepl: Listening...');
+            servers.push(serv);
 	}
     } catch(e) {
         log('MozRepl: Exception: ' + e);
@@ -171,13 +173,16 @@ function onStopListening(serv, status) {
 
 function stop() {
     log('MozRepl: Closing...');
-    serv.close();
+    servers.forEach(function(serv) {
+      serv.close();
+    });
     sessions.quit();
     serv = undefined;
+    servers = [];
 }
 
 function isActive() {
-    if(serv)
+    if(servers.length >= 1)
         return true;
 }
 
