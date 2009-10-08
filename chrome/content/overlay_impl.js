@@ -77,11 +77,12 @@ function togglePref(prefName) {
 
 function toggleServer(sourceCommand) {
     var port = pref.getIntPref('port');
+    var interactors = pref.getCharPref('interactors');
 
     if(server.isActive())
         server.stop();
     else
-        server.start(port);
+        server.start(port,interactors);
 }
 
 function updateMenu(xulPopup) {

@@ -97,8 +97,17 @@ function init(context) {
     this.defineInteractor('http-inspect', httpInspectInteractor);
     this.loadInit();
 
-    var defaultInteractorClass = (this._interactorClasses[srvPref.getCharPref('defaultInteractor')] ||
+    var defaultInteractorClass = null;
+
+    if(this.interactors) {
+      defaultInteractorClass = (this._interactorClasses[this.getConfiguredInteractor()] ||
                                   this._interactorClasses['javascript']);
+    }
+    else {
+      defaultInteractorClass = (this._interactorClasses[srvPref.getCharPref('defaultInteractor')] ||
+                                  this._interactorClasses['javascript']);
+    }
+
     var defaultInteractor = new defaultInteractorClass(this);
 
     this._interactorStack = [defaultInteractor];
@@ -483,6 +492,19 @@ defineInteractor.doc = 'Defines a new interactor.';
 
 function currentInteractor() {
     return this._interactorStack[this._interactorStack.length-1];
+}
+
+function getConfiguredInteractor() {
+  var current_session = this;
+  var configured_interactor = null;
+
+  Array.forEach(this.interactors, function(item) {
+    if(item.port === current_session.port) {
+      configured_interactor = item.type;
+    }
+  });
+
+  return configured_interactor;
 }
 
 function popInteractor() {

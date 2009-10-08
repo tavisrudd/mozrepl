@@ -54,12 +54,18 @@ function toggleServer(sourceCommand) {
         .getBranch('extensions.mozrepl.')
         .getIntPref('port');
 
+    var interactors = Components
+        .classes['@mozilla.org/preferences-service;1']
+        .getService(Components.interfaces.nsIPrefService)
+        .getBranch('extensions.mozrepl.')
+        .getCharPref('interactors');
+
     if(this._server.isActive()) {
         this._server.stop();
         sourceCommand.setAttribute('label', 'Start Repl');
     }
     else {
-        this._server.start(port);
+        this._server.start(port,interactors);
         sourceCommand.setAttribute('label', 'Stop Repl');
     }
 }

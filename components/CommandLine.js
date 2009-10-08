@@ -24,10 +24,17 @@ const Handler = {
         } catch (e) {
         }
 
-        if(uri || cmdLine.handleFlag('repl', false))
-            Cc['@hyperstruct.net/mozlab/mozrepl;1']
+	var interactors = Components
+            .classes['@mozilla.org/preferences-service;1']
+            .getService(Components.interfaces.nsIPrefService)
+            .getBranch('extensions.mozrepl.')
+            .getCharPref('interactors');
+
+	if (uri || cmdLine.handleFlag('repl', false)) {
+          Cc['@hyperstruct.net/mozlab/mozrepl;1']
             .getService(Ci.nsIMozRepl)
-            .start(uri ? parseInt(uri) : 4242);
+            .start(uri ? parseInt(uri) : 4242, interactors);
+        }
     },
 
     helpInfo: '-repl              Start REPL.\n',

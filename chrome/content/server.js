@@ -88,13 +88,27 @@ var sessions = {
 };
 
 
-function start(port) {
+function start(port,interactors) {
     try {
-        serv = Cc['@mozilla.org/network/server-socket;1']
-            .createInstance(Ci.nsIServerSocket);
-        serv.init(port, pref.getBoolPref('loopbackOnly'), -1);
-        serv.asyncListen(this);
-        log('MozRepl: Listening...');
+        this_server = this;
+        if (interactors) {
+	    this.interactors = JSON.parse(interactors);
+	    log('MozRepl: interactors "'+interactors+'"');
+	    Array.forEach(this.interactors, function (item) {
+		let serv = Cc['@mozilla.org/network/server-socket;1']
+		    .createInstance(Ci.nsIServerSocket);
+		serv.init(parseInt(item.port), pref.getBoolPref('loopbackOnly'), -1);
+		serv.asyncListen(this_server);
+		log('MozRepl: Listening on port '+item.port+' ('+item.type +')...');
+	    });
+	}
+	else {
+            serv = Cc['@mozilla.org/network/server-socket;1']
+		.createInstance(Ci.nsIServerSocket);
+            serv.init(port, pref.getBoolPref('loopbackOnly'), -1);
+            serv.asyncListen(this);
+            log('MozRepl: Listening...');
+	}
     } catch(e) {
         log('MozRepl: Exception: ' + e);
     }
@@ -119,6 +133,10 @@ function onSocketAccepted(serv, transport) {
         .getMostRecentWindow('');
 
     var session = new REPL();
+
+    session.port = serv.port;
+    session.interactors = this.interactors;
+    
     session.onOutput = function(string) {
         outstream.write(string, string.length);
     };
@@ -172,14 +190,14 @@ function observe(subject, topic, data) {
     case 'final-ui-startup':
         if(srvPref.getBranch('network.').getBoolPref('online') &&
            pref.getBoolPref('autoStart'))
-            this.start(pref.getIntPref('port'));
+            this.start(pref.getIntPref('port'),pref.getCharPref('interactors'));
 
         break;
     case 'network:offline-status-changed':
         switch(data) {
         case 'online':
             if(pref.getBoolPref('autoStart'))
-                this.start(pref.getIntPref('port'));
+                this.start(pref.getIntPref('port'),pref.getCharPref('interactors'));
             break;
         case 'offline':
             if(isActive())
