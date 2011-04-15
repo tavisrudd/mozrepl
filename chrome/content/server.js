@@ -95,6 +95,7 @@ function start(port) {
         serv.init(port, pref.getBoolPref('loopbackOnly'), -1);
         serv.asyncListen(this);
         log('MozRepl: Listening...');
+        pref.setBoolPref('started', true);
     } catch(e) {
         log('MozRepl: Exception: ' + e);
     }
@@ -155,6 +156,7 @@ function stop() {
     log('MozRepl: Closing...');
     serv.close();
     sessions.quit();
+    pref.setBoolPref('started', false);
     serv = undefined;
 }
 
@@ -164,12 +166,20 @@ function isActive() {
 }
 
 function observe(subject, topic, data) {
+    /**
+       NOTE:
+       On Gecko 1.9.2 we're observing app-startup and then profile-after-change
+
+       On Gecko 2.0 we're observing only profile-after-change 
+
+       (See https://developer.mozilla.org/en/XPCOM/XPCOM_changes_in_Gecko_2.0)
+     */
     switch(topic) {
-    case 'app-startup':
-        srvObserver.addObserver(this, 'network:offline-status-changed', false);
-        srvObserver.addObserver(this, 'final-ui-startup', false);
+    case 'app-startup': // Gecko 1.9.2 only
+	srvObserver.addObserver(this, 'profile-after-change', false);
         break;
-    case 'final-ui-startup':
+    case 'profile-after-change': // Gecko 1.9.2 and Gecko 2.0 
+        srvObserver.addObserver(this, 'network:offline-status-changed', false);
         if(srvPref.getBranch('network.').getBoolPref('online') &&
            pref.getBoolPref('autoStart'))
             this.start(pref.getIntPref('port'));
@@ -187,6 +197,8 @@ function observe(subject, topic, data) {
             break;
         }
         break;
+    case 'quit-application-granted':
+	this.stop();
     }
 }
 
