@@ -38,12 +38,11 @@
 
 function helpUrlFor(thing) {
     function xulPlanetXpcomClassUrl(classID) {
-        return 'http://xulplanet.com/references/xpcomref/comps/c_' +
-            classID.replace(/^@mozilla.org\//, '').replace(/[;\?\/=\-]/g, '') + '.html';
+        return 'https://developer.mozilla.org/en-US/search?q=' + escape('"'+classID+'"');
     }
     function xulPlanetXulElementUrl(element) {
-        return 'http://xulplanet.com/references/elemref/ref_' +
-            element.nodeName + '.html';
+        return 'http://developer.mozilla.org/en/XUL/' +
+            element.nodeName;
     }
 
     if(typeof(thing) == 'string') {
