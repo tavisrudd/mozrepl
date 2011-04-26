@@ -15,7 +15,7 @@
   </preferences>
  
   <checkbox preference="mozrepl_autostart" id="autostart" label="Activate on startup"/>
-  <checkbox preference="mozrepl_loopback_only" id="loopback" label="Allow outside connections"/>
+  <checkbox preference="mozrepl_loopback_only" id="loopback" label="Allow local connections only"/>
   <hbox align="center">
     <label control="port" value="Port:"/>
     <textbox preference="mozrepl_port" id="port" type="number"
